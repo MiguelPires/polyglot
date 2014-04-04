@@ -1,4 +1,4 @@
-polyglot
+Polyglot
 ========
 
 Know your languages.
