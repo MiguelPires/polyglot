@@ -1,61 +1,88 @@
 from __future__ import division
-import sys, os
-
-LANGUAGES = {"c" : "C", "py": "Python"}#, "pyc": "Python"}
-languagesCounter = {"C": 0, "Python": 0}
-totalFilesCounter = 0
-unknownLanguagesCounter = 0
-unknownLanguages = []
-
-def cutFileName (fileName):
-	extensionIndex = fileName.rfind('.')+1
-	return fileName [extensionIndex :]
-
-def checkFile (fileName):
-	global languagesCounter, unknownLanguagesCounter, totalFilesCounter, LANGUAGES
-	extension = cutFileName (fileName)
-
-	if extension in LANGUAGES:
-		languagesCounter [LANGUAGES [extension]] += 1
-	else:
-		unknownLanguagesCounter += 1
-
-		if not extension in unknownLanguages:
-			unknownLanguages.append(extension)
-
-	totalFilesCounter += 1
+import os
 
 
-def polyglot (fileName):
+class Polyglot:
+	""" 1: At this point filePath is just the fileName and the CWD combined. Needs fixing.
+	Maybe a walk through the OS directory tree will be needed to locate the directory.
+		2: Add YAML parsing"""
 
-	if fileName[0] == '\'' and fileName[len(fileName)-1] == '\'':
-		fileName = fileName[1:len(fileName)-1] 
+	LANGUAGES = {"c" : "C", "py": "Python"}#, "pyc": "Python"}
 
-	filePath = os.path.abspath(fileName)
+	def __init__(self, fileName):
+		self.baseFile = fileName
+		self.totalFilesCounter = 0
+		self.unknownLanguagesCounter = 0
+		self.unknownLanguages = []
+		self.languagesCounter = {"C": 0, "Python": 0}
+		self.runAnalysis (fileName)
 
-	if not os.path.exists (filePath):
-		print "File doesn't exist."
-		sys.exit()	
+	def __repr__ (self):
+		return self.knownLanguagesString() + self.unknownLanguagesString()
 
-	if os.path.isfile (filePath):
-		checkFile (fileName)
+	def knownLanguagesString (self):
+		if not self.totalFilesCounter == 0:
+			v = ""
+			for key, value in self.languagesCounter.iteritems():
+				if not value == 0:
+					v += str (key)+ ": " + str (round(value / self.totalFilesCounter*100, 1)) + "%\n"
 
-	elif os.path.isdir (filePath):
-		contentList = os.listdir (filePath)
-		for file in contentList:
-			polyglot (os.path.join(filePath, file))
+			return v
 
-if __name__ == '__main__':
-	polyglot (sys.argv[1])
+		else:
+			raise Exception ("No files were analyzed")
 
-	for key, value in languagesCounter.iteritems():
-		if not value == 0 or not totalFilesCounter == 0:
-			print key+":", round(value/totalFilesCounter*100, 1), "%"
+	def unknownLanguagesString (self):
+		if not self.unknownLanguagesCounter == 0:
+			return str (round(self.unknownLanguagesCounter / self.totalFilesCounter*100, 1))+ "% of the files were of unknown type.\nUnknown extensions:" + str (self.unknownLanguages)	+"\n"
 
-	if not unknownLanguagesCounter == 0:
-		print round(unknownLanguagesCounter/totalFilesCounter*100, 1), "% of the files were of unknown type.\nUnknown extensions:", unknownLanguages
+	def getTotalFilesCounter (self):
+		return self.totalFilesCounter
 
+	def getUnknownLanguagesCounter (self):
+		return self.unknownLanguagesCounter
 
+	def getUnkownLanguages (self):
+		return self.unknownLanguages
 
+	def getLanguageCounter (self, language):
+		if language in languagesCounter:
+			return self.languagesCounter [language] 
 
+		else:
+			raise KeyError ("Invalid language")
+
+	@staticmethod
+	def parseFileName (fileName):
+		if fileName[0] == '\'' and fileName[len(fileName)-1] == '\'':
+			fileName = fileName[1:len(fileName)-1] 
+
+		return os.path.abspath(fileName)
+
+	def checkFile (self, fileName):
+		extension = fileName [fileName.rfind('.')+1 :]
+
+		if extension in self.LANGUAGES:
+			self.languagesCounter [self.LANGUAGES [extension]] += 1
+		else:
+			self.unknownLanguagesCounter += 1
+
+			if not extension in self.unknownLanguages:
+				self.unknownLanguages.append (extension)
+
+		self.totalFilesCounter += 1
+
+	def runAnalysis (self, fileName):
+		filePath = self.parseFileName (fileName)
+
+		if not os.path.exists (filePath):
+			raise Exception ("File \""+fileName+"\" doesn't exist.")
+
+		if os.path.isfile (filePath):
+			self.checkFile (fileName)
+
+		elif os.path.isdir (filePath):
+			contentList = os.listdir (filePath)
+			for file in contentList:
+				self.runAnalysis (os.path.join(filePath, file))
 
