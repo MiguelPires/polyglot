@@ -2,15 +2,12 @@ from __future__ import division
 import os, yaml
 
 class Polyglot:
-	""" 1: At this point filePath is just the fileName and the CWD combined. Needs fixing.
-	Maybe a walk through the OS directory tree will be needed to locate the directory.
-		"""
+	""" Polyglot searches for the file passed as an argument in the directories below the user's CWD.
+	It does the same for the languages file."""
 
-	LANGUAGES = {"c" : "C", "py": "Python"}#, "pyc": "Python"}
-
-	def __init__(self, fileName, languagesFile = 'polyglot/languages.yml'):
+	def __init__(self, fileName, languagesFileArg = 'languages.yml'):
 		self.baseFile = fileName
-		self.languagesFile = self.tryOpenFile (languagesFile)
+		self.languagesFile = self.tryOpenFile (languagesFileArg)
 		self.languages = yaml.safe_load (self.languagesFile)
 		self.totalFilesCounter = 0
 		self.unknownLanguagesCounter = 0
@@ -21,7 +18,7 @@ class Polyglot:
 		self.runAnalysis (fileName)
 
 	def __repr__ (self):
-		return self.knownLanguagesString() + self.unknownLanguagesString() + self.ignoredLanguagesString()
+		return self.knownLanguagesString() + self.unknownLanguagesString() + "\n" + self.ignoredLanguagesString()
 
 	def __del__ (self):
 		self.languagesFile.close()
@@ -29,17 +26,22 @@ class Polyglot:
 	@staticmethod
 	def tryOpenFile (file):
 		try:
-			return open(file, 'r')
+			return open(Polyglot.find (file) , 'r')
 		except IOError, e:
 		 	print e
 
+	@classmethod
+	def find (cls, name, root = os.getcwd()):
+		for path, dirs, files in os.walk(root, False):
+			if name in files or name in dirs:
+				return os.path.join(path, name)
+		
 	def knownLanguagesString (self):
 		if not self.totalFilesCounter == 0:
 			v = str (round(self.recognizedFilesCounter / self.totalFilesCounter*100, 1))+ "% of the files were recognized. Recognized files:\n"
 			for key, value in self.languagesCounter.iteritems():
 				if not value == 0:
 					v += "** " + str (key)+ ": " + str (round(value / self.totalFilesCounter*100, 1)) + "%\n"
-
 			return v
 
 		else:
@@ -47,11 +49,11 @@ class Polyglot:
 
 	def unknownLanguagesString (self):
 		if not self.unknownLanguagesCounter == 0:
-			return str (round(self.unknownLanguagesCounter / self.totalFilesCounter*100, 1))+ "% of the files were of unknown type. Unknown extensions:\n" + str (self.unknownLanguages)	+"\n"
+			return str (round(self.unknownLanguagesCounter / self.totalFilesCounter*100, 1))+ "% of the files were of unknown type. Unknown extensions:\n" + str (self.unknownLanguages)
 
 	def ignoredLanguagesString(self):
 		if not self.ignoredLanguagesCounter == 0:
-			return str (round(self.ignoredLanguagesCounter / self.totalFilesCounter*100, 1))+ "% of the files were ignored. Ignored extensions:\n" + str (self.languages ['Ignore']) +"\n"
+			return str (round(self.ignoredLanguagesCounter / self.totalFilesCounter*100, 1))+ "% of the files were ignored. Ignored extensions:\n" + str (self.languages ['Ignore'])
 
 	def getLanguageCounter (self, language):
 		if language in languagesCounter:
@@ -65,7 +67,7 @@ class Polyglot:
 		if fileName[0] == '\'' and fileName[len(fileName)-1] == '\'':
 			fileName = fileName[1:len(fileName)-1] 
 
-		return os.path.abspath (fileName)
+		return Polyglot.find (fileName)
 
 	def generateExtensions (self):											# unused but pretty cool									
 		for sublist in self.languages.values():
@@ -121,5 +123,5 @@ class Polyglot:
 		elif os.path.isdir (filePath):
 			contentList = os.listdir (filePath)
 			for file in contentList:
-				self.runAnalysis (os.path.join(filePath, file))
+				self.runAnalysis (file)
 
