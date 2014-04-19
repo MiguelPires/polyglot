@@ -1,0 +1,4 @@
+--- # Languages : Extensions
+C : [c, h]
+Python : [py]
+Ignore : [yml]
