@@ -10,23 +10,25 @@ class Polyglot:
 		self.languagesFile = self.tryOpenFile (languagesFileArg)
 		self.languages = yaml.safe_load (self.languagesFile)
 		self.totalFilesCounter = 0
-		self.unknownLanguagesCounter = 0
-		self.unknownLanguages = []
-		self.ignoredLanguagesCounter = 0
 		self.recognizedFilesCounter = 0
-		self.languagesCounter = {"C": 0, "Python": 0}
 		self.runAnalysis (fileName)
 
 	def __repr__ (self):
-		return self.knownLanguagesString() + self.unknownLanguagesString() + "\n" + self.ignoredLanguagesString()
+		if not self.totalFilesCounter == 0:
+			return self.knownLanguagesString() + self.unknownLanguagesString() + "\n" + self.ignoredLanguagesString()
 
-	def __del__ (self):
-		self.languagesFile.close()
+		else:
+			return "No files read."
+
+	def __del__ (self): 
+		"""with open ('output.yaml', 'w') as output:	
+			output.write (yaml.dump (self.languages, output, default_flow_style=True))
+		self.languagesFile.close()""" #poop happening
 
 	@staticmethod
 	def tryOpenFile (file):
 		try:
-			return open(Polyglot.find (file) , 'r')
+			return open(Polyglot.find (file) , 'r+')
 		except IOError, e:
 		 	print e
 
@@ -35,32 +37,30 @@ class Polyglot:
 		for path, dirs, files in os.walk(root, False):
 			if name in files or name in dirs:
 				return os.path.join(path, name)
-		
-	def knownLanguagesString (self):
-		if not self.totalFilesCounter == 0:
-			v = str (round(self.recognizedFilesCounter / self.totalFilesCounter*100, 1))+ "% of the files were recognized. Recognized files:\n"
-			for key, value in self.languagesCounter.iteritems():
-				if not value == 0:
-					v += "** " + str (key)+ ": " + str (round(value / self.totalFilesCounter*100, 1)) + "%\n"
-			return v
 
-		else:
-			raise Exception ("No files were analyzed")
+	def knownLanguagesString (self):
+		v = str (round(self.recognizedFilesCounter / self.totalFilesCounter*100, 1))+ "% of the files were recognized. Recognized files:\n"
+		for key, value in self.languages.iteritems():
+			languagecounter = value[1]
+			if not languagecounter == 0 and key != 'Ignore' and key != 'Unknown':
+				v += "** " + str (key)+ ": " + str (round(languagecounter / self.totalFilesCounter*100, 1)) + "%\n"
+		
+		return v
 
 	def unknownLanguagesString (self):
-		if not self.unknownLanguagesCounter == 0:
-			return str (round(self.unknownLanguagesCounter / self.totalFilesCounter*100, 1))+ "% of the files were of unknown type. Unknown extensions:\n" + str (self.unknownLanguages)
-
-	def ignoredLanguagesString(self):
-		if not self.ignoredLanguagesCounter == 0:
-			return str (round(self.ignoredLanguagesCounter / self.totalFilesCounter*100, 1))+ "% of the files were ignored. Ignored extensions:\n" + str (self.languages ['Ignore'])
-
-	def getLanguageCounter (self, language):
-		if language in languagesCounter:
-			return self.languagesCounter [language] 
+		unknownLanguagesCounter = self.languages ['Unknown'][1]
+		if not unknownLanguagesCounter == 0:
+			return str (round(unknownLanguagesCounter / self.totalFilesCounter*100, 1))+ "% of the files were of unknown type. Unknown extensions:\n" + str (self.languages ['Unknown'][0]).strip('[]')
 
 		else:
-			raise KeyError ("Invalid language")
+			return ""
+
+	def ignoredLanguagesString(self):
+		ignoredLanguagesCounter = self.languages ['Ignore'][1]
+		if not ignoredLanguagesCounter == 0:
+			return str (round(ignoredLanguagesCounter / self.totalFilesCounter*100, 1))+ "% of the files were recognized but ignored. Ignored extensions:\n" + str (self.languages ['Ignore'][0]).strip('[]')
+		else:
+			return ""
 
 	@staticmethod
 	def parseFileName (fileName):
@@ -74,38 +74,44 @@ class Polyglot:
 			for item in sublist:
 				yield item
 
-	def getListOfExtension (self, extension):								# returns the entire list of extensions where an extension belongs
-		for sublist in self.languages.values():								# if the extension doesn't belong to any list, returns None
-			if extension in sublist:
+	def generateSublist (self):											# unused but pretty cool									
+		for sublist in self.languages.values():
+			yield sublist
+
+	def getListFromExtension (self, extension):						# returns the of data of the language where 'extension' belongs
+		for sublist in self.languages.values():						# if extension isn't found, returns None
+			if extension in sublist[0]:								# sublist = [extensionsList, counter]
 				return sublist
-		
+
 		return None
 
-	def getLanguageFromExtensionList (self, list):							# returns the key associated with a value
-		for key, value in self.languages.iteritems():						# the keys are language names and the values are lists of extensions
-			if value == list:
+	def getLanguageFromExtension (self, extension):						# returns the language name associated with an extension
+		dataList = self.getListFromExtension (extension)
+		for key, value in self.languages.iteritems():					
+			if value == dataList:
 				return key
 
 		return None
 
+	def incrementLanguageCounter (self, extension):
+		self.incrementLanguageCounter (self.getLanguageFromExtension (extension))
+
+	def incrementLanguageCounter (self, language):
+		self.languages[language][1] += 1
+
 	def updateStats (self, fileName):
 		extension = fileName [fileName.rfind('.')+1 :]
-		extList = self.getListOfExtension (extension)
+		languageName = self.getLanguageFromExtension (extension)
+	
+		if languageName == None:														# extension wasn't found in .yml
+			if extension not in self.languages['Unknown'][0]:
+				self.languages['Unknown'][0].append (extension)
 
-		if extList == None:														# extension wasn't found in .yml
-			self.unknownLanguagesCounter += 1
-
-			if not extension in self.unknownLanguages:
-				self.unknownLanguages.append (extension)
+			self.languages['Unknown'][1] += 1
+			# encontrar o UNKOWN, incrementar o contador e adicionar a extensao	
 
 		else:
-			languageName = self.getLanguageFromExtensionList (extList)		
-
-			if languageName == "Ignore":									# ignored extensions
-				self.ignoredLanguagesCounter += 1		
-
-			else:
-				self.languagesCounter [languageName] += 1
+				self.incrementLanguageCounter (languageName)
 				self.recognizedFilesCounter += 1
 
 		self.totalFilesCounter += 1

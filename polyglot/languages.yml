@@ -1,4 +1,13 @@
---- # Languages : Extensions
-C : [c, h]
-Python : [py]
-Ignore : [yml]
+--- # Languages : [ [Extensions], counter]
+C:
+- [c, h]
+- 0
+Python:
+- [py]
+- 0
+Ignore:
+- [yml]
+- 0
+Unknown:
+- []
+- 0
