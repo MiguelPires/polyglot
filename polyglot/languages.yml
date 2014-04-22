@@ -1,13 +1,7 @@
---- # Languages : [ [Extensions], counter]
+--- # Languages : [ [Extensions]]
 C:
 - [c, h]
-- 0
 Python:
 - [py]
-- 0
-Ignore:
+YAML:
 - [yml]
-- 0
-Unknown:
-- []
-- 0
