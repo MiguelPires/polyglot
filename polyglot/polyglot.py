@@ -1,10 +1,16 @@
+#!/usr/bin/env python
 from __future__ import division
 import os, yaml
 
+__author__ = "Miguel Pires, Hugo Martins"
+__license__ = "MIT"
+__status__ = "Prototype"
+
 class Polyglot:
-	""" Polyglot searches for the file passed as an argument in or below the user's CWD.
+	""" Polyglot recieves either a path (relative or absolute) to a directory or just a directory name. 
+	In case the argument is just a file name, Polyglot searches for the file passed in or below the user's CWD.
 	It does the same for the languages file. The file extensions are searched in a .yml file and statistics pertaining to
-	the occurrences of known or unknown extensions are outputed"""
+	the occurrences of known or unknown extensions are outputed to the terminal."""
 
 	def __init__ (self, fileName, languagesFileArg = 'languages.yml'):
 		self.baseFile = fileName
@@ -15,7 +21,7 @@ class Polyglot:
 		self.languagesCounter = {}
 		self.unknownLanguagesCounter = 0
 		self.unknownLanguages = []
-		self.runAnalysis (fileName)
+		self.runAnalysis (fileName) 								#runs the analysis on the directory passes as an argument
 
 	def __repr__ (self):
 		if not self.totalFilesCounter == 0:
@@ -67,7 +73,20 @@ class Polyglot:
 		if fileName[0] == '\'' and fileName[len(fileName)-1] == '\'':
 			fileName = fileName[1:len(fileName)-1]
 
-		return Polyglot.find (fileName)
+		if '.' in fileName:														# gets the absolute path if the argument was a relative path
+			filePath = os.path.abspath (fileName)
+
+		elif os.path.isabs(fileName):											# if the argument was an absolute path, uses it
+			filePath = fileName
+	
+		else:																	# if the argument was a directory name, finds the path to the directory
+			filePath = Polyglot.find (fileName)
+
+		if not os.path.exists (filePath):										# no such file or directory exists 
+			errMsg = "File \""+fileName+"\" doesn't exist."
+			raise Exception (errMsg)
+
+		return filePath
 
 
 	def getListFromExtension (self, extension):                     # returns the of data of the language where 'extension' belongs
@@ -110,15 +129,11 @@ class Polyglot:
 	def runAnalysis (self, fileName):
 		filePath = self.parseFileName (fileName)
 
-		if not os.path.exists (filePath):									# no file or directory exists with 
-			errMsg = "File \""+fileName+"\" doesn't exist."
-			raise Exception (errMsg)
-
 		if os.path.isfile (filePath):										# if the fileName is associated with a file, checks for its extension
 			self.updateStats (fileName)
 
 		elif os.path.isdir (filePath):										# if the fileName is associated with a directory, runs the check for each file within the directory (recursively)
 			contentList = os.listdir (filePath)
 			for file in contentList:
-				self.runAnalysis (file)
+				self.runAnalysis (os.path.join (filePath, file))
 
