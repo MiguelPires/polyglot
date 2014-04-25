@@ -1,6 +1,8 @@
 --- # Languages : [ [Extensions]]
 C:
 - [c, h]
+Java:
+- [java]
 Python:
 - [py]
 YAML:
