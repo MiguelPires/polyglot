@@ -26,6 +26,7 @@ class Polyglot:
 		self.unknownLanguagesCounter = 0
 		self.unknownLanguages = [] 
 		self.runAnalysis (fileName) 	# runs the analysis on the directory passes as an argument
+		self.counterStats();
 
 	def __repr__ (self):
 		if not self.totalFilesCounter == 0:
@@ -46,8 +47,7 @@ class Polyglot:
 			+ "% of the files were recognized. Recognized files:\n"
 
 		for key, counter in self.languagesCounter.iteritems():
-				v += "** " + str (key)+ ": " + str (round(counter \
-				 / self.totalFilesCounter*100, 1)) + "%\n"
+				v += "** " + str (key) + ": " + str (counter * 100) + "%\n"
 		
 		return v
 
@@ -55,7 +55,7 @@ class Polyglot:
 		if not self.unknownLanguagesCounter == 0:
 			return str (round(self.unknownLanguagesCounter \
 			 	/ self.totalFilesCounter*100, 1))+ "% of the files were of unknown \
-			 	type. Unknown extensions:\n" \
+type. Unknown extensions:\n" \
 			 	+ str (self.unknownLanguages).strip('[]')
 
 		else:
@@ -164,4 +164,8 @@ class Polyglot:
 			contentList = os.listdir (filePath)
 			for file in contentList:
 				self.runAnalysis (os.path.join (filePath, file))
+
+	def counterStats(self):
+		for key, value in self.languagesCounter.iteritems():
+			self.languagesCounter[key] = round(value / self.totalFilesCounter, 2)
 
