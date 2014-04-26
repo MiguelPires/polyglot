@@ -27,7 +27,7 @@ Running the program on its on `polyglot/` folder:
 
 For the moment there's no installation *per se*. For now, just run the script to get the output.
 
-It the future there will probably exit one.
+It the future there will probably exist one.
 
 ### Contributing
 
