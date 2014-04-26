@@ -1,9 +1,43 @@
 --- # Languages : [ [Extensions]]
+ActionScript:
+- [as]
 C:
 - [c, h]
+C#:
+- [cs]
+C++:
+- [cpp C c++ cc H h++ hpp]
+CSS:
+- [css]
+Clojure:
+- [clj]
+CoffeScript:
+- [coffee]
+Common Lisp:
+- [lisp]
+HTML:
+- [html]
 Java:
 - [java]
+JavaScript:
+- [js]
+Lua:
+- [lua]
+Objective-C:
+- [m]
+PHP:
+- [php]
+Perl:
+- [pl]
 Python:
 - [py]
+Ruby:
+- [rb]
+SQL:
+- [sql]
+Scala:
+- [scala]
+Scheme:
+- [scm]
 YAML:
 - [yml]
