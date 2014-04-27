@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 from __future__ import division
-import os, yaml
+import os, sys, yaml
+
+DEBUG_UNKNOWN = False
 
 __author__ = "Miguel Pires, Hugo Martins"
 __copyright__ = "Copyright 2014, Miguel Pires"
@@ -21,49 +23,50 @@ class Polyglot:
 		self.languagesFile = self.tryOpenFile (languagesFileArg)
 		self.languages = yaml.safe_load (self.languagesFile)
 		self.totalFilesCounter = 0
-		self.recognizedFilesCounter = 0
 		self.languagesCounter = {}
 		self.unknownLanguagesCounter = 0
+		self.languagesFileNames = {}
 		self.unknownLanguages = [] 
-		self.runAnalysis (fileName) 	# runs the analysis on the directory passes as an argument
+		self.runAnalysis (self.baseFile) 	# runs the analysis on the directory passes as an argument
 		self.counterStats();
 
 	def __repr__ (self):
 		if not self.totalFilesCounter == 0:
 			# the class representation - the analysis stats
-			return self.knownLanguagesString() + self.unknownLanguagesString()				
+			representation = self.knownLanguagesString()
+			if DEBUG_UNKNOWN:
+				representation += self.unknownLanguagesString()
+			return representation
+
 		else:
 			return "No files read."
 
-	#def __del__ (self): 
-		#self.languagesFile.close() #poop happening - (what a marvelous comment this is)
-	
 	""" string methods for printing output. Prints the percentages of each 
 		recognized file type, total recognized files, unknown extension, etc.
 	"""
 
 	def knownLanguagesString (self):
-		v = str (round(self.recognizedFilesCounter / self.totalFilesCounter*100, 1)) \
-			+ "% of the files were recognized. Recognized files:\n"
-
+		v = ""
 		for key, counter in self.languagesCounter.iteritems():
 				v += "** " + str (key) + ": " + str (counter * 100) + "%\n"
+				filesList = self.languagesFileNames [key]
+				for file in filesList:
+					_, tail = os.path.split (self.baseFile)
+					v += "\t" + file [file.find(tail) :] + "\n"
+					
 		
 		return v
 
 	def unknownLanguagesString (self):
 		if not self.unknownLanguagesCounter == 0:
-			return str (round(self.unknownLanguagesCounter \
-			 	/ self.totalFilesCounter*100, 1))+ "% of the files were of unknown \
-type. Unknown extensions:\n" \
-			 	+ str (self.unknownLanguages).strip('[]')
+			return "Unknown extensions:\n" + str (self.unknownLanguages).strip('[]')
 
 		else:
-			return ""
+			return "No unknown languages"
 
 	""" methods related to finding files below or in the current directory 
-		used for finding and opening the YAML file.
-	"""
+		used for finding and opening the YAML file.	"""
+
 	@staticmethod
 	def tryOpenFile (file):
 		try:
@@ -147,10 +150,15 @@ type. Unknown extensions:\n" \
 				self.unknownLanguages.append (extension)
 
 		else:	#extension was found (recognized) in .yml
-				self.incrementLanguageCounter (languageName)				
-				self.recognizedFilesCounter += 1
+			self.incrementLanguageCounter (languageName)				
 
-		self.totalFilesCounter += 1
+			if languageName not in self.languagesFileNames:
+				self.languagesFileNames.update ({languageName: [fileName]})
+
+			else:
+				self.languagesFileNames[languageName].append(fileName)
+
+			self.totalFilesCounter += 1
 
 	def runAnalysis (self, fileName):
 		filePath = self.parseFileName (fileName)
@@ -169,3 +177,6 @@ type. Unknown extensions:\n" \
 		for key, value in self.languagesCounter.iteritems():
 			self.languagesCounter[key] = round(value / self.totalFilesCounter, 2)
 
+if __name__ == '__main__':
+	p = Polyglot (sys.argv[1])
+	print p 
