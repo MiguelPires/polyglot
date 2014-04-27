@@ -11,15 +11,30 @@ We still have a lot to work on.
 
 ### Usage
 
-Running the program on its on `polyglot/` folder:
+Running the program on its on `polyglot/` folder without the debug option:
 
-    $ python daemon.py ../polyglot/
+    $ python polyglot.py ../polyglot/
     
-    83.3% of the files were recognized. Recognized files:
-    ** Python: 67.0%
-    ** YAML: 17.0%
-    16.7% of the files were of unknown type. Unknown extensions:
-    'pyc'
+    ** Python: 75.0%
+    	polyglot\polyglot\polyglot.py
+    	polyglot\polyglot\test.py
+    	polyglot\polyglot\__init__.py
+    ** YAML: 25.0%
+    	polyglot\polyglot\languages.yml
+
+With the debug option:
+
+    $ python polyglot.py ../polyglot/
+    
+    ** Python: 75.0%
+    	polyglot\polyglot\polyglot.py
+    	polyglot\polyglot\test.py
+    	polyglot\polyglot\__init__.py
+    ** YAML: 25.0%
+    	polyglot\polyglot\languages.yml
+    Unknown extensions:
+    'txt', 'pyc'
+
   
 ### Language Detection
 
