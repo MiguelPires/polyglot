@@ -19,7 +19,7 @@ class Polyglot:
 	outputed to the terminal."""
 
 	def __init__ (self, fileName, languagesFileArg = 'languages.yml'):
-		self.baseFile = fileName
+		self.initialPath = self.parseFileName (fileName)
 		self.languagesFile = self.tryOpenFile (languagesFileArg)
 		self.languages = yaml.safe_load (self.languagesFile)
 		self.totalFilesCounter = 0
@@ -27,7 +27,7 @@ class Polyglot:
 		self.unknownLanguagesCounter = 0
 		self.languagesFileNames = {}
 		self.unknownLanguages = [] 
-		self.runAnalysis (self.baseFile) 	# runs the analysis on the directory passes as an argument
+		self.runAnalysis (self.initialPath) 	# runs the analysis on the directory passes as an argument
 		self.counterStats();
 
 	def __repr__ (self):
@@ -51,9 +51,8 @@ class Polyglot:
 				v += "** " + str (key) + ": " + str (counter * 100) + "%\n"
 				filesList = self.languagesFileNames [key]
 				for file in filesList:
-					_, tail = os.path.split (self.baseFile)
-					v += "\t" + file [file.find(tail) :] + "\n"
-					
+					_, directory = os.path.split(self.initialPath)
+					v += "\t" + directory + file [file.rfind(self.initialPath) + len(self.initialPath): ] + "\n"					
 		
 		return v
 
@@ -82,7 +81,7 @@ class Polyglot:
 			if name in files or name in dirs:
 				return os.path.join(path, name)
 
-		errorMsg = "File\\directory "+name+"was not found." 	# 404: file not found
+		errorMsg = "Directory "+name+" was not found." 	# 404: file not found
 		raise Exception (errorMsg)
 
 
