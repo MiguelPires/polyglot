@@ -1,0 +1,8 @@
+--- # Languages : [ Syntax strings, ... ]
+
+Perl: 
+- "#!/usr/local/bin/perl"
+- "@"
+
+Prolog: 
+- ":-"
