@@ -13,7 +13,7 @@ __license__ = "MIT"
 __version__ = "0.1"
 __status__ = "Prototype"
 
-class Polyglot:
+class Polyglot (object):
     """ Polyglot recieves either a path (relative or absolute) to a directory 
     or just a directory name. In case the argument is just a file name, Polyglot
     searches for the file passed in or below the user's CWD. It does the same 
@@ -22,16 +22,29 @@ class Polyglot:
     outputed to the terminal."""
 
     def __init__ (self, fileName, languagesFileArg='languages.yml'):
+
+        #the path to the first directory passed to Polyglot
         self.initialPath = self.parseFileName (fileName)
         self.languagesFile = self.tryOpenFile (languagesFileArg)
+
+        # {language1: [extensions], language2: [extensions]}
         self.languages = yaml.safe_load (self.languagesFile)
+
         self.totalFilesCounter = 0
+
+        # contains a counter of occurrences for each language after runAnalysis is run
+        # and a percentage (occurrences / totalFilesCounter) after counterStats is run
         self.languagesCounter = {}
-        self.unknownLanguagesCounter = 0
+
+        # contains the paths to the identified files of each language
+        # {language1: [path_to_file, path_to_other_file], language2: []}
         self.languagesFileNames = {}
+
+        # for debbugging purposes only - the DEBUG_UNKNOWN must be True
+        # keeps the extensions and a counter for unknown extensions
         self.unknownLanguages = [] 
-        self.runAnalysis (self.initialPath)     # runs the analysis on the directory passes as an argument
-        self.counterStats();
+        self.unknownLanguagesCounter = 0
+        
 
     def __repr__(self):
         if not self.totalFilesCounter == 0:
@@ -118,7 +131,7 @@ class Polyglot:
 
         for key, value in self.languages.iteritems():             
             if extension in value:
-                languages.append (key);
+                languages.append (key)
 
         return languages
 
@@ -143,7 +156,8 @@ class Polyglot:
                 self.languageOccurrence (fileName, finalLanguage)
 
             #else:              #language still wasn't decided
-    # updates everything related to the occurrence of a language 
+
+    # updates everything related to the occurrence of a known extension
     def languageOccurrence(self, fileName, language):
         self.incrementLanguageCounter (language)                
 
@@ -161,6 +175,11 @@ class Polyglot:
 
         else:
             self.languagesCounter.update ({language: 1})
+
+    def startPolyglot(self):
+        # runs the analysis on the directory passed as an argument
+        self.runAnalysis(self.initialPath)    
+        self.counterStats()
 
     def runAnalysis(self, fileName):
         filePath = self.parseFileName (fileName)
@@ -181,4 +200,5 @@ class Polyglot:
 
 if __name__ == '__main__':
     polyglot = Polyglot (sys.argv[1])
+    polyglot.startPolyglot()
     print polyglot 
