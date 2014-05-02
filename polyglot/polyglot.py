@@ -2,6 +2,7 @@
 from __future__ import division
 import os
 import sys
+import getopt
 import yaml
 import heuristics
 
@@ -21,10 +22,16 @@ class Polyglot (object):
     statistics pertaining to the occurrences of known or unknown extensions are 
     outputed to the terminal."""
 
-    def __init__ (self, fileName, languagesFileArg='languages.yml'):
+    def __init__ (self, fileName, flag = "all", languagesFileArg='languages.yml'):
 
-        #the path to the first directory passed to Polyglot
+        # the path to the first directory passed to Polyglot
         self.initialPath = self.parseFileName (fileName)
+
+        # output mode based on command line flags
+        # possible flags: -p (programming files only), -d (data files only), -a (all [enabled by default])
+        self.mode = flag
+
+        #
         self.languagesFile = self.tryOpenFile (languagesFileArg)
 
         # {language1: [extensions], language2: [extensions]}
@@ -82,6 +89,8 @@ class Polyglot (object):
     """ methods related to finding files below or in the current directory 
         used for finding and opening the YAML file. """
 
+
+
     @staticmethod
     def tryOpenFile(file):
         try:
@@ -124,13 +133,26 @@ class Polyglot (object):
             raise Exception (errMsg)
 
         return filePath
+  
+    """ returns the of data of the language where 'extension' belongs
+        if extension isn't found, returns None
+        sublist = [extensionsList]
+    """
+    def getListFromExtension (self, extension):                     
+        for sublist in self.languages.values():                     
+            if extension in sublist[0]:                             
+                return sublist
+        
+        return None
 
     def getLanguagesFromExtension(self, extension):
         # returns the language name associated with an extension
         languages = []
 
-        for key, value in self.languages.iteritems():             
-            if extension in value:
+        for key, value in self.languages.iteritems():
+
+            # only analyses the files relevant to the flag specified
+            if (self.mode == "all" or self.mode == value[1]) and extension in value[0]:
                 languages.append (key)
 
         return languages
@@ -198,7 +220,33 @@ class Polyglot (object):
         for key, value in self.languagesCounter.iteritems():
             self.languagesCounter[key] = round(value / self.totalFilesCounter, 2)
 
+def parseCommandLine ():
+    opts, args = getopt.getopt(sys.argv[1:], "hpda")
+
+    # only supports one flag
+    for flag in opts:
+        if '-p' in flag:
+            return args[0], "programming"   # programming files only
+        
+        elif '-d' in flag:                  # data files only
+            return args[0], "data"
+
+        elif '-a' in flag:                  # all files
+            return args[0], "all"
+
+        else:                               # help
+            print "Polyglot supports the following searches:\n\
+            -p    programming languages only\n\
+            -d    data files only\n\
+            -a    every file"
+            return args[0], -1
+
 if __name__ == '__main__':
-    polyglot = Polyglot (sys.argv[1])
+
+    fileName, flag = parseCommandLine()
+    if flag == -1:
+        exit()
+
+    polyglot = Polyglot (fileName, flag)
     polyglot.startPolyglot()
     print polyglot 

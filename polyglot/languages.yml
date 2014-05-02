@@ -1,23 +1,67 @@
---- # Languages : [ [Extensions]]
-ActionScript: [as]
-C: [c, h]
-C#: [cs]
-C++: [cpp, C, c++, cc, H, h++, hpp]
-CSS: [css]
-Clojure: [clj]
-CoffeScript: [coffee]
-Common Lisp: [lisp]
-HTML: [html]
-Java: [java]
-JavaScript: [js]
-Lua: [lua]
-Objective-C: [m]
-PHP: [php]
-Perl: [pl]
-Prolog: [pl]
-Python: [py]
-Ruby: [rb]
-SQL: [sql]
-Scala: [scala]
-Scheme: [scm]
-YAML: [yml]
+--- # Languages : [ [Extensions], Type]
+ActionScript:
+    - [as]
+    - programming
+C: 
+    - [c, h]
+    - programming
+C#: 
+    - [cs]
+    - programming
+C++: 
+    - [cpp, C, c++, cc, H, h++, hpp]
+    - programming
+CSS: 
+    - [css]
+    - programming
+Clojure: 
+    - [clj]
+    - programming
+CoffeScript: 
+    - [coffee]
+    - programming
+Common Lisp: 
+    - [lisp]
+    - programming
+HTML: 
+    - [html]
+    - programming
+Java: 
+    - [java]
+    - programming
+JavaScript: 
+    - [js]
+    - programming
+Lua: 
+    - [lua]
+    - programming 
+Objective-C: 
+    - [m]
+    - programming
+PHP: 
+    - [php]
+    - programming
+Perl: 
+    - [pl]
+    - programming
+Prolog: 
+    - [pl]
+    - programming
+Python: 
+    - [py]
+    - programming
+Ruby: 
+    - [rb]
+    - programming
+SQL: 
+    - [sql]
+    - programming
+Scala: 
+    - [scala]
+    - programming
+Scheme: 
+    - [scm]
+    - programming
+YAML: 
+    - [yml]
+    - data
