@@ -64,7 +64,7 @@ class Polyglot (object):
     def knownLanguagesString(self):
         out = ""
         for key, counter in self.languagesCounter.iteritems():
-                out += "** " + str (key) + ": " + str (counter * 100) + "%\n"
+                out += "\n** " + str (key) + ": " + str (counter * 100) + "%\n"
                 filesList = self.languagesFileNames[key]
                 for file in filesList:
                     _, directory = os.path.split(self.initialPath)

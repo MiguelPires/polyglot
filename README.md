@@ -21,8 +21,10 @@ Running the program on its own `polyglot/` folder without the debug option:
     	polyglot\polyglot\polyglot.py
     	polyglot\polyglot\test.py
     	polyglot\polyglot\__init__.py
+
     ** YAML: 25.0%
     	polyglot\polyglot\languages.yml
+        
 
 With the debug option:
 
@@ -32,10 +34,12 @@ With the debug option:
     	polyglot\polyglot\polyglot.py
     	polyglot\polyglot\test.py
     	polyglot\polyglot\__init__.py
+
     ** YAML: 25.0%
     	polyglot\polyglot\languages.yml
     Unknown extensions:
     'txt', 'pyc'
+
 
   
 ### Language Detection
