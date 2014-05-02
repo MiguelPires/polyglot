@@ -235,10 +235,16 @@ def parseCommandLine ():
             return args[0], "all"
 
         else:                               # help
-            print "Polyglot supports the following searches:\n\
-            -p    programming languages only\n\
-            -d    data files only\n\
-            -a    every file"
+            print "\n    NAME:\n\
+        polyglot - Know your languages. A language detector written in Python 2.7.\
+            \n\n    USAGE:\n\
+        python polyglot.py [options] [args]\
+            \n\n    VERSION:\n\
+        0.0.2\
+            \n\n    OPTIONS:\n\
+        -p    print programming languages only\n\
+        -d    print data files only\n\
+        -a    print every file"
             return None, -1
 
     return args[0], "all"
