@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import unittest
-from .. import polyglot
+from polyglot import *
 
 class TestOne(unittest.TestCase):
 
