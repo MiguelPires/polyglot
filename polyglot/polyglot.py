@@ -239,8 +239,10 @@ def parseCommandLine ():
             -p    programming languages only\n\
             -d    data files only\n\
             -a    every file"
-            return args[0], -1
+            return None, -1
 
+    return args[0], "all"
+    
 if __name__ == '__main__':
 
     fileName, flag = parseCommandLine()
