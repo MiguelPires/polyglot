@@ -6,3 +6,8 @@ Perl:
 
 Prolog: 
 - ":-"
+
+Objective-C:
+- "@interface"
+- "@end"
+- "Foundation.h"
