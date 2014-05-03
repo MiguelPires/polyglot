@@ -54,7 +54,8 @@ Apart from debug mode, there are still some options that impact the output of po
         -a  every file
         -h  print help menu
     	
-    	
+The `-a` flag is used by default if no option is used.
+
 ### Language Detection
 
 #### Basic Detection
