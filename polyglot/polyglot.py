@@ -202,6 +202,7 @@ class Polyglot (object):
         # runs the analysis on the directory passed as an argument
         self.runAnalysis(self.initialPath)    
         self.counterStats()
+        return self.languagesCounter
 
     def runAnalysis(self, fileName):
         filePath = self.parseFileName (fileName)
