@@ -88,4 +88,4 @@ direction.
 We want to understand where we want to go first, and go there, before we can have
 other people on board.
 
-Still, if you want to contribute with ideas or foudn any kind of bug, just create a new issue and we'd be glad to hear from you.
+Still, if you want to contribute with ideas or found any kind of bug, just create a new issue and we'd be glad to hear from you.
