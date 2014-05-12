@@ -22,17 +22,22 @@ class Polyglot (object):
     statistics pertaining to the occurrences of known or unknown extensions are 
     outputed to the terminal."""
 
-    def __init__ (self, fileName, flag = "all", languagesFileArg='languages.yml'):
+    def __init__ (self, fileName, flag="all", debug=False):
 
         # the path to the first directory passed to Polyglot
         self.initialPath = self.parseFileName (fileName)
 
         # output mode based on command line flags
         # possible flags: -p (programming files only), -d (data files only), -a (all [enabled by default])
-        self.mode = flag
+        # flag checking in case Polyglot is wrongly used after being imported as a module
+        if flag in ["all", "programming", "data"]:
+            self.mode = flag
+
+        else:
+            raise ValueError ("Invalid flag passed as argument\n"+helpText())
 
         #
-        self.languagesFile = self.tryOpenFile (languagesFileArg)
+        self.languagesFile = self.tryOpenFile ('languages.yml')
 
         # {language1: [extensions], language2: [extensions]}
         self.languages = yaml.safe_load (self.languagesFile)
@@ -49,6 +54,8 @@ class Polyglot (object):
 
         # for debbugging purposes only - the DEBUG_UNKNOWN must be True
         # keeps the extensions and a counter for unknown extensions
+        global DEBUG_UNKNOWN
+        DEBUG_UNKNOWN = debug
         self.unknownLanguages = [] 
         self.unknownLanguagesCounter = 0
         
@@ -202,7 +209,10 @@ class Polyglot (object):
         # runs the analysis on the directory passed as an argument
         self.runAnalysis(self.initialPath)    
         self.counterStats()
-        return self.languagesCounter
+        if DEBUG_UNKNOWN:
+            return self.languagesCounter, self.unknownLanguages
+        else:
+            return self.languagesCounter
 
     def runAnalysis(self, fileName):
         filePath = self.parseFileName (fileName)
@@ -222,7 +232,13 @@ class Polyglot (object):
             self.languagesCounter[key] = round(value / self.totalFilesCounter, 2)
 
 def parseCommandLine ():
-    opts, args = getopt.getopt(sys.argv[1:], "hpda")
+    
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "hpda")
+
+    except getopt.GetoptError:
+        print helpText()
+        return None, -1
 
     # only supports one flag
     for flag in opts:
@@ -236,7 +252,13 @@ def parseCommandLine ():
             return args[0], "all"
 
         else:                               # help
-            print "\n    NAME:\n\
+            print helpText()
+            return None, -1
+
+    return args[0], "all"
+
+def helpText():
+  return "\n    NAME:\n\
         polyglot - Know your languages. A language detector written in Python 2.7.\
             \n\n    USAGE:\n\
         python polyglot.py [options] [args]\
@@ -246,10 +268,7 @@ def parseCommandLine ():
         -p    print programming languages only\n\
         -d    print data files only\n\
         -a    print every file"
-            return None, -1
 
-    return args[0], "all"
-    
 if __name__ == '__main__':
 
     fileName, flag = parseCommandLine()
@@ -259,3 +278,4 @@ if __name__ == '__main__':
     polyglot = Polyglot (fileName, flag)
     polyglot.startPolyglot()
     print polyglot 
+
