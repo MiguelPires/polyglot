@@ -3,27 +3,28 @@ Polyglot
 
 Polyglot is a language detector written in Python 2.7.
 
-It's heavily inspired in <a href="https://github.com/github/linguist"> Linguist </a>
-by GitHub.
+It's heavily inspired in <a href="https://github.com/github/linguist"> Linguist </a> by GitHub.
 
-This project was born as a learning experience with the Python language. It's 
-meant to be taken seriously but, still, is far from what Linguist is capable of.
+This project was born as a learning experience with the Python language. It's  meant to be taken seriously but, still, is far from what Linguist is capable of.
 
 We still have a lot to work on.
 
-### Usage
+## Usage
 
 Polyglot can be used a stand-alone application or it can be imported as a module. 
-Furthermore, there is a debug unknown languages' option.
+Furthermore, there is a debug unknown languages option and several flags to choose from.
 
 ### Arguments
 
-The only required argument is the fileName that can be a relative or absolute path or just a file name (in which case Polyglot will try to find the file path). The optional flag argument must be one of the following strings ["all", "programming", "data"]. "all" is the default value.
+When running Polyglot, as an app or by importing it as a module, there are some variants you can opt for. 
+There are flags that narrow down the search to a specific type of file and also a debug option that includes unknown files in the output. You can read about them in the flags and debug chapters.
+
+The only required argument is the file name that can be a relative or absolute path or just a file name (in which case Polyglot will try to find the file path). The optional flag argument must be one of the following strings ["all", "programming", "data"]. "all" is the default value.
 The debug argument can either be True or False, being False the default value.
 
 #### Flags
 
-Apart from this, there are still some options that impact the output of polyglot. If you run with `-h` option you can see all of it:
+Apart from this, there are still some flags that impact the output of polyglot. If you run with `-h` option you can see all of them:
 
     $ python polyglot.py -h
     
@@ -53,10 +54,7 @@ With the debug option:
     Unknown extensions:
     'txt', 'pyc'
 
-#### Stand-alone app
-
-When running Polyglot as an app there are some variants you can opt for. 
-There are flags that narrow down the search to a specific type of file and also a debug option that includes unknown files in the output. You can read about them in the flags and debug chapters.
+### Stand-alone app
 
 There are two ways of running it as an app: with or without the debug unknown languages' option. The debug option is a specific variable located at the top of the `polyglot.py` file which is `False` by default.
 
@@ -73,7 +71,7 @@ Running the program on its own `polyglot/` folder in it's simplest form (without
     	polyglot\languages.yml
     	polyglot\syntax.yml
 
-#### Module
+### Module
 
 If you want to integrate Polyglot in a different application, there is the possibility of importing it as a module. 
 An simple example of this usage would be the following script:
@@ -107,7 +105,7 @@ Now an example that enables the debug option:
 
 As you can see, if the debug option is enabled Polyglot will return a tuple containing the language statistics dictionary in it's first index and an array containing every unkown extension found (stuff like build and compiled files will be the vast majority of what you see here).
 
-### Language Detection
+## Language Detection
 
 Language detection works in three stages. If any of the stages succeds in identifying the file language, the next stages are not executed.
 
@@ -117,38 +115,33 @@ After that, there is the heuristics stage, in which Polyglot tries to disambigua
 
 Lastly, there is the (as of yet non-existent) classifier stage. This feature isn't implemented yet as we would like to solidify the basis of Polyglot before we move on.
 
-#### Basic Detection
+### Basic Detection
 
 First we run a simple extension analyzer. Since most filename extensions aren't common to several languages, in most cases, specially with simple projects this works like a charm and is quite fast.
 
 We run the `runAnalysis` recursively. This function differentiates between directories and files. If it's running with a file as an argument it calls `updateStats` to update the info or, if it finds a directory, it runs itself with every file it finds as an argument.
 
-#### Heuristics
+### Heuristics
 
 For extensions that Polyglot can't assign to a single language like '.pl' (Prolog and Perl) or '.h' (headers of most C variants), heuristics are employed to find the language in function of what's written on the file. Some language specific syntax strings (like ':-' for Prolog) are used as a way to disambiguate between languages. For now it's pretty indecent but it'll work just fine.
 
-#### Classifier
+### Classifier
 
 For extensions that cannot be disambiguated by the application of heuristics we are building a statistical classifier that determines what is the most likely language for the file in question.
 
-### Installation
+## Installation
 
-For the moment there's no installation *per se*. For now, just run the script
-to get the output.
-
+For the moment there's no installation *per se*. For now, just run the script to get the output.
 In the future there will probably exist one.
 
-### Testing
+## Testing
 
 We are still having some difficulties integrating the testing suite with the rest of the application. We're working hard on it.
 
-### Contributing
+## Contributing
 
-For now, contributions will only be accepted for the `languages.yml` file because
-the project is still under heavy development and, specially, lacking a definitive 
-direction.
+For now, contributions will only be accepted for the `languages.yml` file because the project is still under heavy development and, specially, lacking a definitive direction.
 
-We want to understand where we want to go first, and go there, before we can have
-other people on board.
+We want to understand where we want to go first, and go there, before we can have other people on board.
 
 Still, if you want to contribute with ideas or found any kind of bug, just create a new issue and we'd be glad to hear from you.
