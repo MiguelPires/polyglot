@@ -11,7 +11,7 @@ We still have a lot to work on.
 
 ## Usage
 
-Polyglot can be used a stand-alone application or it can be imported as a module. 
+Polyglot can be used a stand-alone application, it can be imported as a module or it can be used as a backend script producing JSON.
 Furthermore, there is a debug unknown languages option and several flags to choose from.
 
 ### Arguments
@@ -19,7 +19,7 @@ Furthermore, there is a debug unknown languages option and several flags to choo
 When running Polyglot, as an app or by importing it as a module, there are some variants you can opt for. 
 There are flags that narrow down the search to a specific type of file and also a debug option that includes unknown files in the output. You can read about them in the flags and debug chapters.
 
-The only required argument is the file name that can be a relative or absolute path or just a file name (in which case Polyglot will try to find the file path). The optional flag argument must be one of the following strings ["all", "programming", "data"]. "all" is the default value.
+The only required argument is the file name that can be a relative or absolute path or just a file name (in which case Polyglot will try to find the file path). The optional flag argument must be one of the following strings `["all", "programming", "data"]`. `"all"` is the default value. Additionally, you can also use the `--json` option along with one of the flags to receive the output as valid JSON.
 The debug argument can either be True or False, being False the default value.
 
 #### Flags
@@ -29,12 +29,13 @@ Apart from this, there are still some flags that impact the output of polyglot. 
     $ python polyglot.py -h
     
     Polyglot supports the following searches:
-        -p  programming languages only
-        -d  data files only
-        -a  every file
-        -h  print help menu
+        -p  	programming languages only
+        -d  	data files only
+        -a  	every file
+        --json 	used before any of the above to produce JSON output
+        -h  	print help menu
     	
-The `-a` flag is used by default if no option is used.
+The `-a` flag is used by default if no option is used. The `--json` flag is by default set to `False`. 
 
 #### Debug
 
@@ -105,6 +106,18 @@ Now an example that enables the debug option:
 
 As you can see, if the debug option is enabled Polyglot will return a tuple containing the language statistics dictionary in it's first index and an array containing every unkown extension found (stuff like build and compiled files will be the vast majority of what you see here).
 
+### JSON output
+
+If you want to get JSON output instead of those nasty strings, being it for use in a backend script with PHP or because you want to integrate the module with another language, this would be the result:
+
+    $ python polyglot.py --json ../polyglot/
+    
+	{
+	    "Python": 0.6,
+	    "YAML": 0.4,
+	    "nFiles": 5
+	}
+	
 ## Language Detection
 
 Language detection works in three stages. If any of the stages succeds in identifying the file language, the next stages are not executed.
