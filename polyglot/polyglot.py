@@ -5,6 +5,7 @@ import sys
 import getopt
 import yaml
 import heuristics
+import json
 
 DEBUG_UNKNOWN = False
 
@@ -54,7 +55,7 @@ class Polyglot (object):
 
         # initially set at false, if this variable is changed to true, polyglot will
         # output the result in a json file
-        self.json = json
+        self.json = jsonFlag
 
         # for debbugging purposes only - the DEBUG_UNKNOWN must be True
         # keeps the extensions and a counter for unknown extensions
@@ -66,15 +67,11 @@ class Polyglot (object):
 
     def __repr__(self):
         if not self.totalFilesCounter == 0:
-            
-            representation = ""
+
             # the class representation - the analysis stats
-            if not self.json:
-            	representation = self.knownLanguagesString()
-            	if DEBUG_UNKNOWN:
-            		representation += self.unknownLanguagesString()
-            else:
-	       		print self.JSONString()
+            representation = self.knownLanguagesString()
+            if DEBUG_UNKNOWN:
+            	representation += self.unknownLanguagesString()
 
             return representation
 
@@ -95,22 +92,6 @@ class Polyglot (object):
                     out += "\t" + directory + file[file.rfind(self.initialPath) + len(self.initialPath): ] + "\n"                 
         
         return out
-
-    def JSONString(self): 
-    	out = "{"
-    	for key, counter in self.languagesCounter.iteritems():
-                out += '\n\t"' + str (key) + '": {\n\t\t"percentage": "' + str (counter * 100) + '",\n'
-                filesList = self.languagesFileNames[key]
-                out += '\t\t"files": [\n'
-                for file in filesList[:-1]:
-                    _, directory = os.path.split(self.initialPath)
-                    out += '\t\t  "' + directory + file[file.rfind(self.initialPath) + len(self.initialPath): ] + '",\n' 
-                file = filesList[-1]
-                out += '\t\t  "' + directory + file[file.rfind(self.initialPath) + len(self.initialPath): ] + '"\n'     
-                out += ' \t\t]'
-                out += '\n\t}'  
-    	out += "\n}"
-    	return out
 
     def unknownLanguagesString(self):
         if not self.unknownLanguagesCounter == 0:
@@ -259,7 +240,7 @@ class Polyglot (object):
 
 def parseCommandLine ():
     
-    json = False
+    jsonFlag = False
 
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hpda", ["json"])
@@ -271,22 +252,28 @@ def parseCommandLine ():
     # only supports one flag
     for flag in opts:
         if '-p' in flag:
-            return args[0], "programming", json   # programming files only
+            return args[0], "programming", jsonFlag   # programming files only
         
         elif '-d' in flag:                  # data files only
-            return args[0], "data", json
+            return args[0], "data", jsonFlag
 
         elif '-a' in flag:                  # all files
-            return args[0], "all", json
+            return args[0], "all", jsonFlag
 
         elif '--json' in flag:				# output will be json
-        	json = True
+        	jsonFlag = True
 
         else:                               # help
             print helpText()
-            return None, -1, json
+            return None, -1, jsonFlag
 
-    return args[0], "all", json
+    return args[0], "all", jsonFlag
+
+def JSON(self):
+
+	self.languagesCounter["nFiles"] = self.totalFilesCounter
+	print json.dumps(self.languagesCounter, sort_keys=True, indent=4, separators=(',', ': '))
+	
 
 def helpText():
   return "\n    NAME:\n\
@@ -302,11 +289,15 @@ def helpText():
 
 if __name__ == '__main__':
 
-    fileName, flag, json = parseCommandLine()
+    fileName, flag, jsonFlag = parseCommandLine()
     if flag == -1:
         exit()
 
-    polyglot = Polyglot (fileName, flag, json)
+    polyglot = Polyglot (fileName, flag, jsonFlag)
     polyglot.startPolyglot()
-    print polyglot 
+
+    if jsonFlag:
+    	JSON(polyglot)
+    else:
+    	print polyglot 
 
