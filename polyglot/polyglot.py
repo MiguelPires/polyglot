@@ -281,11 +281,12 @@ def helpText():
             \n\n    USAGE:\n\
         python polyglot.py [options] [args]\
             \n\n    VERSION:\n\
-        0.0.2\
+        0.0.3\
             \n\n    OPTIONS:\n\
-        -p    print programming languages only\n\
-        -d    print data files only\n\
-        -a    print every file"
+        -p\tprint programming languages only\n\
+        -d\tprint data files only\n\
+        -a\tprint every file\n\
+        --json\tused before any of the above to produce JSON output"
 
 if __name__ == '__main__':
 
