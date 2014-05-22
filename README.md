@@ -9,6 +9,18 @@ This project was born as a learning experience with the Python language. It's  m
 
 We still have a lot to work on.
 
+	NAME:
+        	polyglot - Know your languages. A language detector written in Python 2.7.
+	USAGE:
+        	python polyglot.py [options] [args]
+	VERSION:
+        	0.0.3
+  	OPTIONS:
+	        -p	print programming languages only
+	        -d	print data files only
+	        -a	print every file
+	        --json	used before any of the above to produce JSON output
+        
 ## Usage
 
 Polyglot can be used a stand-alone application, it can be imported as a module or it can be used as a backend script producing JSON.
