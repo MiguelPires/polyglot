@@ -12,7 +12,7 @@ DEBUG_UNKNOWN = False
 __author__ = "Miguel Pires, Hugo Martins"
 __copyright__ = "Copyright 2014, Miguel Pires"
 __license__ = "MIT"
-__version__ = "0.1"
+__version__ = "0.0.3"
 __status__ = "Prototype"
 
 class Polyglot (object):
