@@ -129,7 +129,11 @@ If you want to get JSON output instead of those nasty strings, being it for use 
 	    "YAML": 0.4,
 	    "nFiles": 5
 	}
-	
+
+## Dependencies
+
+- <a href="http://http://pyyaml.org/">PyYAML</a>
+
 ## Language Detection
 
 Language detection works in three stages. If any of the stages succeds in identifying the file language, the next stages are not executed.
