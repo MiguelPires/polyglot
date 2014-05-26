@@ -157,12 +157,3 @@ For extensions that Polyglot can't assign to a single language like '.pl' (Prolo
 ### Classifier
 
 For extensions that cannot be disambiguated by the application of heuristics we are building a statistical classifier that determines what is the most likely language for the file in question.
-
-## Installation
-
-For the moment there's no installation *per se*. For now, just run the script to get the output.
-In the future there will probably exist one.
-
-## Testing
-
-We are still having some difficulties integrating the testing suite with the rest of the application. We're working hard on it.
