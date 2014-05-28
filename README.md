@@ -18,6 +18,7 @@ We still have a lot to work on.
   	OPTIONS:
 	        -p	print programming languages only
 	        -d	print data files only
+            -m  print markup files only
 	        -a	print every file
 	        --json	used before any of the above to produce JSON output
         
@@ -31,7 +32,7 @@ Furthermore, there is a debug unknown languages option and several flags to choo
 When running Polyglot, as an app or by importing it as a module, there are some variants you can opt for. 
 There are flags that narrow down the search to a specific type of file and also a debug option that includes unknown files in the output. You can read about them in the flags and debug chapters.
 
-The only required argument is the file name that can be a relative or absolute path or just a file name (in which case Polyglot will try to find the file path). The optional flag argument must be one of the following strings `["all", "programming", "data"]`. `"all"` is the default value. Additionally, you can also use the `--json` option along with one of the flags to receive the output as valid JSON.
+The only required argument is the file name that can be a relative or absolute path or just a file name (in which case Polyglot will try to find the file path). The optional flag argument must be one of the following strings `["all", "programming", "data", "markup"]`. `"all"` is the default value. Additionally, you can also use the `--json` option along with one of the flags to receive the output as valid JSON.
 The debug argument can either be True or False, being False the default value.
 
 #### Flags
@@ -43,6 +44,7 @@ Apart from this, there are still some flags that impact the output of polyglot. 
     Polyglot supports the following searches:
         -p  	programming languages only
         -d  	data files only
+        -m      markup files only
         -a  	every file
         --json 	used before any of the above to produce JSON output
         -h  	print help menu
