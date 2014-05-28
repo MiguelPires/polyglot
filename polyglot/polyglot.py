@@ -4,8 +4,8 @@ import os
 import sys
 import getopt
 import yaml
-import heuristics
 import json
+import heuristics
 
 DEBUG_UNKNOWN = False
 
@@ -31,11 +31,11 @@ class Polyglot (object):
         # output mode based on command line flags
         # possible flags: -p (programming files only), -d (data files only), -a (all [enabled by default])
         # flag checking in case Polyglot is wrongly used after being imported as a module
-        if flag in ["all", "programming", "data"]:
+        if flag in ["all", "programming", "data", "markup"]:
             self.mode = flag
 
         else:
-            raise ValueError ("Invalid flag passed as argument\n"+helpText())
+            raise ValueError ("Invalid flag passed as argument\n")
 
         #
         self.languagesFile = self.tryOpenFile ('languages.yml')
@@ -43,7 +43,11 @@ class Polyglot (object):
         # {language1: [extensions], language2: [extensions]}
         self.languages = yaml.safe_load (self.languagesFile)
 
+        # the number of files analysed
         self.totalFilesCounter = 0
+
+        # the total size of the files analysed
+        self.totalBytesCounter = 0
 
         # contains a counter of occurrences for each language after runAnalysis is run
         # and a percentage (occurrences / totalFilesCounter) after counterStats is run
@@ -165,7 +169,7 @@ class Polyglot (object):
 
         for key, value in self.languages.iteritems():
 
-            # only analyses the files relevant to the flag specified
+            # only analyses the files relevant to the specified flag 
             if (self.mode == "all" or self.mode == value[1]) and extension in value[0]:
                 languages.append (key)
 
@@ -176,46 +180,58 @@ class Polyglot (object):
         extension = fileName [fileName.rfind('.')+1 :]
         languageNames = self.getLanguagesFromExtension (extension)
 
-        if len (languageNames) == 0:            # extension wasn't found in .yml                                   
+  		# extension wasn't found in .yml       
+        if len (languageNames) == 0:                                      
             self.unknownLanguagesCounter += 1
             if extension not in self.unknownLanguages:
                 self.unknownLanguages.append (extension)
 
-        elif len (languageNames) == 1:   #extension's language was found (recognized) in .yml
+		#extension's language was found (recognized) in .yml
+        elif len (languageNames) == 1:   
             self.languageOccurrence (fileName, languageNames[0])
 
-        elif len (languageNames) > 1:       #disambiguate between multiple languages
+		#disambiguate between multiple languages
+        elif len (languageNames) > 1:       
             h = heuristics.Heuristics (fileName, languageNames)
             finalLanguage = h.disambiguate (fileName, languageNames)
 
-            if finalLanguage != None:       #language was decided
+			#language was decided
+            if finalLanguage != None:       
                 self.languageOccurrence (fileName, finalLanguage)
-
-            #else:              #language still wasn't decided
 
     # updates everything related to the occurrence of a known extension
     def languageOccurrence(self, fileName, language):
-        self.incrementLanguageCounter (language)                
 
-        if language not in self.languagesFileNames:
-            self.languagesFileNames.update ({language: [fileName]})
+        # gets the file size
+        size = os.stat(fileName)[6]
+
+        # ignores empty files
+    	if size != 0:
+            size = os.stat(fileName)[6]
+            self.incrementLanguageCounter (language, size)                
+
+            if language not in self.languagesFileNames:
+                self.languagesFileNames.update ({language: [fileName]})
+
+            else:
+                self.languagesFileNames[language].append(fileName)
+
+            self.totalBytesCounter += size
+            self.totalFilesCounter += 1
+
+    #updates the occurrences of a language based on the file size
+    def incrementLanguageCounter(self, language, size):
+        if language in self.languagesCounter:          
+            self.languagesCounter[language] += size
 
         else:
-            self.languagesFileNames[language].append(fileName)
+            self.languagesCounter.update ({language: size})
 
-        self.totalFilesCounter += 1
-
-    def incrementLanguageCounter(self, language):
-        if language in self.languagesCounter:           
-            self.languagesCounter[language] += 1
-
-        else:
-            self.languagesCounter.update ({language: 1})
-
+    # runs the analysis on the directory passed as an argument
     def startPolyglot(self):
-        # runs the analysis on the directory passed as an argument
         self.runAnalysis(self.initialPath)    
         self.counterStats()
+
         if DEBUG_UNKNOWN:
             return self.languagesCounter, self.unknownLanguages
         else:
@@ -229,26 +245,29 @@ class Polyglot (object):
             self.updateStats (fileName)
 
         # if is directory, runs the check for each file within the directory 
-        elif os.path.isdir (filePath):                                      
-            contentList = os.listdir (filePath)
-            for file in contentList:
-                self.runAnalysis (os.path.join (filePath, file))
+        elif os.path.isdir (filePath):  
+
+        # ignores vendor files
+            if "vendor" not in fileName:                             
+                contentList = os.listdir (filePath)
+                for file in contentList:
+                    self.runAnalysis (os.path.join (filePath, file))
 
     def counterStats(self):
         for key, value in self.languagesCounter.iteritems():
-            self.languagesCounter[key] = round(value / self.totalFilesCounter, 2)
+            self.languagesCounter[key] = round(value / self.totalBytesCounter, 3)
 
 def parseCommandLine ():
     
     jsonFlag = False
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hpda", ["json"])
+        opts, args = getopt.getopt(sys.argv[1:], "hpdma", ["json"])
 
     except getopt.GetoptError:
         print helpText()
         return None, -1
-
+    
     # only supports one flag
     for flag in opts:
         if '-p' in flag:
@@ -256,6 +275,9 @@ def parseCommandLine ():
         
         elif '-d' in flag:                  # data files only
             return args[0], "data", jsonFlag
+
+        elif '-m' in flag:
+            return args[0], "markup", jsonFlag
 
         elif '-a' in flag:                  # all files
             return args[0], "all", jsonFlag
